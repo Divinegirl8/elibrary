@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +24,7 @@ public class Book {
     private String bookId;
     private String title;
     @ElementCollection
+    @Fetch(FetchMode.JOIN)
     private List<String> author = new ArrayList<>();
     @ElementCollection
     private List<String> subjects = new ArrayList<>();

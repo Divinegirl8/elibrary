@@ -53,6 +53,12 @@ public class LiberianServiceApp implements LiberianService {
 
     }
 
+    @Override
+    public List<Book> liberianReadingList(Long id) throws ElibraryException {
+        Liberian liberian = findBy(id);
+        return liberian.getReadingList();
+    }
+
     private SearchBookResponse getSearchBookResponse(long id, String jsonResponse) throws JsonProcessingException, ElibraryException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(jsonResponse);
