@@ -25,6 +25,9 @@ public class Book {
     @ElementCollection
     @Fetch(FetchMode.JOIN)
     private List<String> author = new ArrayList<>();
+    @ElementCollection
+    @Fetch(FetchMode.JOIN)
+    private List<String> formats = new ArrayList<>();
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "book_subjects",joinColumns = @JoinColumn(name = "book_id"))
     private List<String> subjects = new ArrayList<>();
@@ -45,6 +48,7 @@ public class Book {
                 ", bookId='" + bookId + '\'' +
                 ", title='" + title + '\'' +
                 ", author=" + author +
+                ", formats=" + formats +
                 ", subjects=" + subjects +
                 ", bookshelves=" + bookshelves +
                 ", languages=" + languages +

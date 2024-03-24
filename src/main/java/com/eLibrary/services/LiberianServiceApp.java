@@ -87,8 +87,10 @@ public class LiberianServiceApp implements LiberianService {
 
             List<String> bookshelves = getBookShelves(bookNode);
 
+            List<String> formats = getFormats(bookNode);
+
             Liberian liberian = findBy(id);
-            Book book = getBook(bookId, bookTitle, authors, bookshelves, subjects, languages, liberian);
+            Book book = getBook(bookId, bookTitle, authors, bookshelves, subjects,languages,formats, liberian);
             liberian.getReadingList().add(book);
             bookRepository.save(book);
             liberianRepository.save(liberian);
@@ -139,13 +141,25 @@ public class LiberianServiceApp implements LiberianService {
         return authors;
     }
 
-    private static Book getBook(String bookId, String bookTitle, List<String> authors, List<String> bookshelves, List<String> subjects, List<String> languages, Liberian liberian) {
+    public static List<String> getFormats(JsonNode bookNode) {
+        List<String> formats = new ArrayList<>();
+        JsonNode formatsNode = bookNode.get("formats");
+        if (formatsNode != null) {
+            formatsNode.fields().forEachRemaining(entry -> {
+                formats.add(entry.getValue().asText());
+            });
+        }
+        return formats;
+    }
+
+    private static Book getBook(String bookId, String bookTitle, List<String> authors, List<String> bookshelves, List<String> subjects, List<String> languages,List<String> formats, Liberian liberian) {
         Book book = new Book();
         book.setBookId(bookId);
         book.setTitle(bookTitle);
         book.setAuthor(authors);
         book.setBookshelves(bookshelves);
         book.setSubjects(subjects);
+        book.setFormats(formats);
         book.setLanguages(languages);
         book.getLiberian().add(liberian);
         liberian.getReadingList().add(book);

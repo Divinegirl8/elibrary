@@ -9,4 +9,11 @@ import lombok.ToString;
 
 public class LiberianRegisterResponse {
     private Long id;
+
+    @Override
+    public String toString() {
+        return "LiberianRegisterResponse{" +
+                "id=" + id +
+                '}';
+    }
 }

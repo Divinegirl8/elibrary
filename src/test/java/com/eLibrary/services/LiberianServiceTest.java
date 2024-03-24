@@ -34,6 +34,7 @@ class LiberianServiceTest {
         LiberianRegisterRequest request = new LiberianRegisterRequest();
         request.setUsername("Derick");
         LiberianRegisterResponse response = liberianService.register(request);
+        log.info("register response -> {}",response);
         assertThat(response).isNotNull();
     }
 
@@ -66,6 +67,13 @@ class LiberianServiceTest {
         searchRequest.setTitle("Romeo and Juliet");
         SearchBookResponse searchResponse = liberianService.searchBook(registerResponse.getId(), searchRequest);
         assertThat(searchResponse).isNotNull();
+        log.info("response -> {}",searchResponse);
+
+        SearchBookRequest searchRequest2 = new SearchBookRequest();
+        searchRequest2.setTitle("Pride and Prejudice");
+        SearchBookResponse searchResponse2 = liberianService.searchBook(registerResponse.getId(), searchRequest2);
+        assertThat(searchResponse2).isNotNull();
+
 
         List<Book> readingList = liberianService.getReadingList(registerResponse.getId());
         assertThat(Collections.singletonList(readingList)).isNotEmpty();
