@@ -20,6 +20,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -28,9 +29,11 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class LiberianServiceApp implements LiberianService {
     private final LiberianRepository liberianRepository;
     private final BookRepository bookRepository;
+
     @Override
     public LiberianRegisterResponse register(LiberianRegisterRequest request) {
         Liberian liberian = new Liberian();
@@ -49,13 +52,15 @@ public class LiberianServiceApp implements LiberianService {
         String apiUrL = "https://gutendex.com/books?search=" + title;
         String jsonResponse = fetchBookInTheApi(apiUrL);
 
+
         return getSearchBookResponse(id, jsonResponse);
 
     }
 
     @Override
-    public List<Book> liberianReadingList(Long id) throws ElibraryException {
-        Liberian liberian = findBy(id);
+    public List<Book> getReadingList(long liberianId) throws ElibraryException {
+        Liberian liberian = findBy(liberianId);
+        Hibernate.initialize(liberian.getReadingList());
         return liberian.getReadingList();
     }
 
@@ -84,8 +89,10 @@ public class LiberianServiceApp implements LiberianService {
 
             Liberian liberian = findBy(id);
             Book book = getBook(bookId, bookTitle, authors, bookshelves, subjects, languages, liberian);
+            liberian.getReadingList().add(book);
             bookRepository.save(book);
             liberianRepository.save(liberian);
+
 
             List<Book> books = new ArrayList<>();
             books.add(book);
@@ -99,6 +106,7 @@ public class LiberianServiceApp implements LiberianService {
         for (JsonNode bookShelvesNode : bookNode.get("bookshelves")){
             bookshelves.add(bookShelvesNode.asText());
         }
+        Hibernate.initialize(bookshelves);
         return bookshelves;
     }
 
@@ -107,6 +115,7 @@ public class LiberianServiceApp implements LiberianService {
         for (JsonNode languageNode : bookNode.get("languages")){
             languages.add(languageNode.asText());
         }
+        Hibernate.initialize(languages);
         return languages;
     }
 
@@ -115,6 +124,7 @@ public class LiberianServiceApp implements LiberianService {
         for (JsonNode subjectNode : bookNode.get("subjects")){
             subjects.add(subjectNode.asText());
         }
+        Hibernate.initialize(subjects);
         return subjects;
     }
 
@@ -125,6 +135,7 @@ public class LiberianServiceApp implements LiberianService {
             authors.add("Birth Year: "+authorNode.get("birth_year").asText());
             authors.add("Death Year: " + authorNode.get("death_year").asText());
         }
+        Hibernate.initialize(authors );
         return authors;
     }
 

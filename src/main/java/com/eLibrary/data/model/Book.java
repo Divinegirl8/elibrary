@@ -16,7 +16,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Entity
 @Getter
 @Setter
-@ToString
 public class Book {
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -26,14 +25,30 @@ public class Book {
     @ElementCollection
     @Fetch(FetchMode.JOIN)
     private List<String> author = new ArrayList<>();
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "book_subjects",joinColumns = @JoinColumn(name = "book_id"))
     private List<String> subjects = new ArrayList<>();
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "book_bookshelves",joinColumns = @JoinColumn(name = "book_id"))
     private List<String> bookshelves = new ArrayList<>();
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "book_languages",joinColumns = @JoinColumn(name = "book_id"))
     private List<String> languages = new ArrayList<>();
-    @ManyToMany(mappedBy = "readingList")
+    @ManyToMany(mappedBy = "readingList", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<Liberian> liberian = new ArrayList<>();
 
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "id=" + id +
+                ", bookId='" + bookId + '\'' +
+                ", title='" + title + '\'' +
+                ", author=" + author +
+                ", subjects=" + subjects +
+                ", bookshelves=" + bookshelves +
+                ", languages=" + languages +
+                '}';
+    }
 
 }

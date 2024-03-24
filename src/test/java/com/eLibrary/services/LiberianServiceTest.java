@@ -6,16 +6,20 @@ import com.eLibrary.dtos.request.SearchBookRequest;
 import com.eLibrary.dtos.response.LiberianRegisterResponse;
 import com.eLibrary.dtos.response.SearchBookResponse;
 import com.eLibrary.exception.ElibraryException;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@Slf4j
 class LiberianServiceTest {
    @Autowired
     LiberianService liberianService;
@@ -49,10 +53,27 @@ class LiberianServiceTest {
 
     }
 
-    @Test void findALiberianReadingList() throws ElibraryException {
-        List<Book> books = liberianService.liberianReadingList(1L);
-        System.out.println(books);
+
+    @Test
+    void testThatALiberianCanSearchForBook3() throws ElibraryException, IOException {
+
+        LiberianRegisterRequest registerRequest = new LiberianRegisterRequest();
+        registerRequest.setUsername("John");
+        LiberianRegisterResponse registerResponse = liberianService.register(registerRequest);
+        assertThat(registerResponse).isNotNull();
+
+        SearchBookRequest searchRequest = new SearchBookRequest();
+        searchRequest.setTitle("Romeo and Juliet");
+        SearchBookResponse searchResponse = liberianService.searchBook(registerResponse.getId(), searchRequest);
+        assertThat(searchResponse).isNotNull();
+
+        List<Book> readingList = liberianService.getReadingList(registerResponse.getId());
+        assertThat(Collections.singletonList(readingList)).isNotEmpty();
+
+
+        log.info("reading-list -> {}", readingList);
     }
+
 
 
 }

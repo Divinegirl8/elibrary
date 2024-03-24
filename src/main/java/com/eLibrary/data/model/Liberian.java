@@ -13,7 +13,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Entity
 @Setter
 @Getter
-@ToString
 public class Liberian {
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -29,5 +28,12 @@ public class Liberian {
     )
     private List<Book> readingList = new ArrayList<>();
 
-
+    @Override
+    public String toString() {
+        return "Liberian{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", readingList=" + readingList +
+                '}';
+    }
 }
