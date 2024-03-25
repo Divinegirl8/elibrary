@@ -186,6 +186,10 @@ public class LiberianServiceApp implements LiberianService {
         }
 
         String jsonResponse = EntityUtils.toString(httpResponse.getEntity());
+
+        if(jsonResponse.isEmpty()){
+            throw new ElibraryException("book not found");
+        }
         httpClient.close();
 
         return jsonResponse;
