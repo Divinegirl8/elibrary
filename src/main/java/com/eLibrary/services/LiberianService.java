@@ -3,6 +3,7 @@ package com.eLibrary.services;
 import com.eLibrary.data.model.Book;
 import com.eLibrary.data.model.Liberian;
 import com.eLibrary.dtos.request.LiberianRegisterRequest;
+import com.eLibrary.dtos.request.ReadingListRequest;
 import com.eLibrary.dtos.request.SearchBookRequest;
 import com.eLibrary.dtos.response.LiberianRegisterResponse;
 import com.eLibrary.dtos.response.SearchBookResponse;
@@ -15,5 +16,5 @@ public interface LiberianService {
 LiberianRegisterResponse register(LiberianRegisterRequest request);
 
     SearchBookResponse searchBook(long id, SearchBookRequest request) throws ElibraryException, IOException;
-    List<Book> getReadingList(long liberianId) throws ElibraryException;
+    List<Book> getReadingList(ReadingListRequest request) throws ElibraryException;
 }

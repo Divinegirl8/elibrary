@@ -2,6 +2,7 @@ package com.eLibrary.services;
 
 import com.eLibrary.data.model.Book;
 import com.eLibrary.dtos.request.LiberianRegisterRequest;
+import com.eLibrary.dtos.request.ReadingListRequest;
 import com.eLibrary.dtos.request.SearchBookRequest;
 import com.eLibrary.dtos.response.LiberianRegisterResponse;
 import com.eLibrary.dtos.response.SearchBookResponse;
@@ -17,6 +18,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Slf4j
@@ -48,9 +51,8 @@ class LiberianServiceTest {
 
     @Test void testThatALiberianCanSearchForBook2() throws ElibraryException, IOException {
         SearchBookRequest request = new SearchBookRequest();
-        request.setTitle("Frankenstein; Or, The Modern Prometheus");
-        SearchBookResponse response = liberianService.searchBook(2,request);
-        assertThat(response).isNotNull();
+        request.setTitle("prideand");
+        assertThrows(ElibraryException.class,()->liberianService.searchBook(2,request));
 
     }
 
@@ -75,7 +77,9 @@ class LiberianServiceTest {
         assertThat(searchResponse2).isNotNull();
 
 
-        List<Book> readingList = liberianService.getReadingList(registerResponse.getId());
+        ReadingListRequest request = new ReadingListRequest();
+        request.setId(registerResponse.getId());
+        List<Book> readingList = liberianService.getReadingList(request);
         assertThat(Collections.singletonList(readingList)).isNotEmpty();
 
 

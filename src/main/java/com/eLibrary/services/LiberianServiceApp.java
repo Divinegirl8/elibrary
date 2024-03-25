@@ -5,6 +5,7 @@ import com.eLibrary.data.model.Liberian;
 import com.eLibrary.data.repository.BookRepository;
 import com.eLibrary.data.repository.LiberianRepository;
 import com.eLibrary.dtos.request.LiberianRegisterRequest;
+import com.eLibrary.dtos.request.ReadingListRequest;
 import com.eLibrary.dtos.request.SearchBookRequest;
 import com.eLibrary.dtos.response.LiberianRegisterResponse;
 import com.eLibrary.dtos.response.SearchBookResponse;
@@ -58,15 +59,24 @@ public class LiberianServiceApp implements LiberianService {
     }
 
     @Override
-    public List<Book> getReadingList(long liberianId) throws ElibraryException {
-        Liberian liberian = findBy(liberianId);
+    public List<Book> getReadingList(ReadingListRequest request) throws ElibraryException {
+        Liberian liberian = findBy(request.getId());
         Hibernate.initialize(liberian.getReadingList());
-        return liberian.getReadingList();
+        List<Book> books = liberian.getReadingList();
+
+        if (books.isEmpty()){
+            throw new ElibraryException("Reading list is empty");
+        }
+        return books;
     }
 
     private SearchBookResponse getSearchBookResponse(long id, String jsonResponse) throws JsonProcessingException, ElibraryException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(jsonResponse);
+
+        if (!root.has("results") || root.get("results").isNull()) {
+            throw new ElibraryException("Book not found");
+        }
 
         return getSearchBooks(id, root);
     }
@@ -74,9 +84,14 @@ public class LiberianServiceApp implements LiberianService {
 
     private SearchBookResponse getSearchBooks(long id, JsonNode root) throws ElibraryException {
         JsonNode results = root.get("results");
+
         SearchBookResponse searchBookResponse = new SearchBookResponse();
 
         for (JsonNode bookNode : results){
+            if (bookNode == null || bookNode.isNull()) {
+                throw new ElibraryException("book not found");
+            }
+
            String bookId = bookNode.get("id").asText();
            String bookTitle = bookNode.get("title").asText();
             List<String> authors = getAuthors(bookNode);
@@ -100,6 +115,11 @@ public class LiberianServiceApp implements LiberianService {
             books.add(book);
             searchBookResponse.setBooks(books);
         }
+
+        if (searchBookResponse.getBooks() == null){
+            throw new ElibraryException("Book not found");
+        }
+
         return searchBookResponse;
     }
 
@@ -161,8 +181,9 @@ public class LiberianServiceApp implements LiberianService {
         book.setSubjects(subjects);
         book.setFormats(formats);
         book.setLanguages(languages);
-        book.getLiberian().add(liberian);
+//        book.getLiberian().add(liberian);
         liberian.getReadingList().add(book);
+
         return book;
     }
 
@@ -186,10 +207,10 @@ public class LiberianServiceApp implements LiberianService {
         }
 
         String jsonResponse = EntityUtils.toString(httpResponse.getEntity());
-
-        if(jsonResponse.isEmpty()){
-            throw new ElibraryException("book not found");
+        if (jsonResponse.isEmpty()) {
+            throw new ElibraryException("Book not found");
         }
+
         httpClient.close();
 
         return jsonResponse;

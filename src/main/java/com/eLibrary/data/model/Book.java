@@ -37,8 +37,8 @@ public class Book {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "book_languages",joinColumns = @JoinColumn(name = "book_id"))
     private List<String> languages = new ArrayList<>();
-    @ManyToMany(mappedBy = "readingList", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    private List<Liberian> liberian = new ArrayList<>();
+//    @ManyToMany(mappedBy = "readingList", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+//    private List<Liberian> liberian = new ArrayList<>();
 
 
     @Override
