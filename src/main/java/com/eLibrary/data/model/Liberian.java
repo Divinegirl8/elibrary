@@ -18,6 +18,9 @@ public class Liberian {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
     private String username;
+    private String password;
+    private boolean isRegistered;
+    private boolean isLogin;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "liberian_reading_list",

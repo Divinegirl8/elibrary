@@ -9,5 +9,5 @@ import java.util.List;
 
 
 public interface LiberianRepository extends JpaRepository<Liberian,Long> {
-
+    Liberian findLiberianByUsername(String username);
 }

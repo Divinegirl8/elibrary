@@ -2,17 +2,22 @@ package com.eLibrary.controller;
 
 import com.eLibrary.data.model.Book;
 import com.eLibrary.dtos.request.LiberianRegisterRequest;
+import com.eLibrary.dtos.request.LoginRequest;
 import com.eLibrary.dtos.request.ReadingListRequest;
 import com.eLibrary.dtos.request.SearchBookRequest;
 import com.eLibrary.dtos.response.LiberianRegisterResponse;
+import com.eLibrary.dtos.response.LoginResponse;
 import com.eLibrary.dtos.response.SearchBookResponse;
 import com.eLibrary.exception.ElibraryException;
 import com.eLibrary.services.LiberianService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -28,6 +33,16 @@ public class LiberianController {
         }
         catch (Exception e){
         return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
+        try {
+            LoginResponse response = service.login(loginRequest);
+            return ResponseEntity.ok().body(response);
+        } catch (ElibraryException e) {
+          return ResponseEntity.status(UNAUTHORIZED).body(e.getMessage());
         }
     }
 
