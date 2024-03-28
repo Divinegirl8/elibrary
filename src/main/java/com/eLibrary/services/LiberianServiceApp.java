@@ -10,6 +10,7 @@ import com.eLibrary.dtos.request.ReadingListRequest;
 import com.eLibrary.dtos.request.SearchBookRequest;
 import com.eLibrary.dtos.response.LiberianRegisterResponse;
 import com.eLibrary.dtos.response.LoginResponse;
+import com.eLibrary.dtos.response.ReadingListResponse;
 import com.eLibrary.dtos.response.SearchBookResponse;
 import com.eLibrary.exception.ElibraryException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -47,7 +48,6 @@ public class LiberianServiceApp implements LiberianService {
 
         liberian.setUsername(request.getUsername().trim());
         liberian.setPassword(request.getPassword().trim());
-        liberian.setRegistered(true);
         liberianRepository.save(liberian);
 
         LiberianRegisterResponse liberianRegisterResponse = new LiberianRegisterResponse();
@@ -73,6 +73,7 @@ public class LiberianServiceApp implements LiberianService {
 
     @Override
     public SearchBookResponse searchBook(long id, SearchBookRequest request) throws ElibraryException, IOException {
+        checkTitleFieldIsNotEmpty(request);
         String title = validateBookTitle(request);
         String apiUrL = "https://gutendex.com/books?search=" + title;
         String jsonResponse = fetchBookInTheApi(apiUrL);
@@ -83,15 +84,17 @@ public class LiberianServiceApp implements LiberianService {
     }
 
     @Override
-    public List<Book> getReadingList(ReadingListRequest request) throws ElibraryException {
+    public ReadingListResponse getReadingList(ReadingListRequest request) throws ElibraryException {
         Liberian liberian = findBy(request.getId());
         Hibernate.initialize(liberian.getReadingList());
         List<Book> books = liberian.getReadingList();
 
         if (books.isEmpty()){
-            throw new ElibraryException("Reading list is empty");
+            throw new ElibraryException("{\"error\" :\"Reading list is empty\"}");
         }
-        return books;
+        ReadingListResponse readingListResponse = new ReadingListResponse();
+        readingListResponse.setBooks(books);
+        return readingListResponse;
     }
 
     private SearchBookResponse getSearchBookResponse(long id, String jsonResponse) throws JsonProcessingException, ElibraryException {
@@ -99,7 +102,7 @@ public class LiberianServiceApp implements LiberianService {
         JsonNode root = mapper.readTree(jsonResponse);
 
         if (!root.has("results") || root.get("results").isNull()) {
-            throw new ElibraryException("Book not found");
+            throw new ElibraryException("{\"error\" :\"Book not found\"}");
         }
 
         return getSearchBooks(id, root);
@@ -110,10 +113,11 @@ public class LiberianServiceApp implements LiberianService {
         JsonNode results = root.get("results");
 
         SearchBookResponse searchBookResponse = new SearchBookResponse();
-
+        List<Book> books = new ArrayList<>();
+        Liberian liberian = findBy(id);
         for (JsonNode bookNode : results){
             if (bookNode == null || bookNode.isNull()) {
-                throw new ElibraryException("book not found");
+                throw new ElibraryException("{\"error\": \"book not found\"}");
             }
 
            String bookId = bookNode.get("id").asText();
@@ -128,20 +132,21 @@ public class LiberianServiceApp implements LiberianService {
 
             List<String> formats = getFormats(bookNode);
 
-            Liberian liberian = findBy(id);
-            Book book = getBook(bookId, bookTitle, authors, bookshelves, subjects,languages,formats, liberian);
-            liberian.getReadingList().add(book);
+            Book book = getBook(bookId, bookTitle, authors, bookshelves, subjects,languages,formats);
             bookRepository.save(book);
-            liberianRepository.save(liberian);
 
-
-            List<Book> books = new ArrayList<>();
+            
             books.add(book);
-            searchBookResponse.setBooks(books);
+            liberian.getReadingList().add(book);
+
         }
 
+
+        liberianRepository.save(liberian);
+        searchBookResponse.setBooks(books);
+
         if (searchBookResponse.getBooks() == null){
-            throw new ElibraryException("Book not found");
+            throw new ElibraryException("{\"error\": \"Book not found\"}");
         }
 
         return searchBookResponse;
@@ -196,7 +201,7 @@ public class LiberianServiceApp implements LiberianService {
         return formats;
     }
 
-    private static Book getBook(String bookId, String bookTitle, List<String> authors, List<String> bookshelves, List<String> subjects, List<String> languages,List<String> formats, Liberian liberian) {
+    private static Book getBook(String bookId, String bookTitle, List<String> authors, List<String> bookshelves, List<String> subjects, List<String> languages,List<String> formats) {
         Book book = new Book();
         book.setBookId(bookId);
         book.setTitle(bookTitle);
@@ -206,7 +211,7 @@ public class LiberianServiceApp implements LiberianService {
         book.setFormats(formats);
         book.setLanguages(languages);
 //        book.getLiberian().add(liberian);
-        liberian.getReadingList().add(book);
+
 
         return book;
     }
@@ -227,12 +232,12 @@ public class LiberianServiceApp implements LiberianService {
         CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
 
         if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK){
-            throw new ElibraryException("Network failure");
+            throw new ElibraryException("{\"error\": \"Network failure\"}");
         }
 
         String jsonResponse = EntityUtils.toString(httpResponse.getEntity());
         if (jsonResponse.isEmpty()) {
-            throw new ElibraryException("Book not found");
+            throw new ElibraryException("{\"error\":\"Book not found\"}");
         }
 
         httpClient.close();
@@ -279,4 +284,11 @@ public class LiberianServiceApp implements LiberianService {
             throw new ElibraryException("{\"pError\": \"password must contain letters,numbers,symbols,with length of 6 - 10.\"}");
         }
     }
+
+    private void checkTitleFieldIsNotEmpty(SearchBookRequest request) throws ElibraryException {
+        if (request.getTitle().trim().isEmpty()){
+            throw new ElibraryException("{\"error\": \"title field is empty\"}");
+        }
+    }
+
 }

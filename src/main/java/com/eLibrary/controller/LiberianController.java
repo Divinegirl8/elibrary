@@ -7,6 +7,7 @@ import com.eLibrary.dtos.request.ReadingListRequest;
 import com.eLibrary.dtos.request.SearchBookRequest;
 import com.eLibrary.dtos.response.LiberianRegisterResponse;
 import com.eLibrary.dtos.response.LoginResponse;
+import com.eLibrary.dtos.response.ReadingListResponse;
 import com.eLibrary.dtos.response.SearchBookResponse;
 import com.eLibrary.exception.ElibraryException;
 import com.eLibrary.services.LiberianService;
@@ -46,7 +47,7 @@ public class LiberianController {
         }
     }
 
-    @GetMapping("/searchBook/{id}")
+    @PostMapping("/searchBook/{id}")
     public ResponseEntity<?> search(@RequestBody SearchBookRequest request, @PathVariable("id") Long id){
         try {
             SearchBookResponse response = service.searchBook(id,request);
@@ -57,10 +58,10 @@ public class LiberianController {
         }
     }
 
-    @GetMapping("/readingList")
+    @PostMapping("/readingList")
     public ResponseEntity<?> readingList(@RequestBody ReadingListRequest request){
         try {
-            List<Book> readingList = service.getReadingList(request);
+            ReadingListResponse readingList = service.getReadingList(request);
             return ResponseEntity.ok().body(readingList);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -8,6 +8,7 @@ import com.eLibrary.dtos.request.ReadingListRequest;
 import com.eLibrary.dtos.request.SearchBookRequest;
 import com.eLibrary.dtos.response.LiberianRegisterResponse;
 import com.eLibrary.dtos.response.LoginResponse;
+import com.eLibrary.dtos.response.ReadingListResponse;
 import com.eLibrary.dtos.response.SearchBookResponse;
 import com.eLibrary.exception.ElibraryException;
 
@@ -20,5 +21,5 @@ public interface LiberianService {
     LoginResponse login(LoginRequest request) throws ElibraryException;
 
     SearchBookResponse searchBook(long id, SearchBookRequest request) throws ElibraryException, IOException;
-    List<Book> getReadingList(ReadingListRequest request) throws ElibraryException;
+    ReadingListResponse getReadingList(ReadingListRequest request) throws ElibraryException;
 }

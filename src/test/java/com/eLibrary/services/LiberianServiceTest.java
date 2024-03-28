@@ -8,6 +8,7 @@ import com.eLibrary.dtos.request.LoginRequest;
 import com.eLibrary.dtos.request.ReadingListRequest;
 import com.eLibrary.dtos.request.SearchBookRequest;
 import com.eLibrary.dtos.response.LiberianRegisterResponse;
+import com.eLibrary.dtos.response.ReadingListResponse;
 import com.eLibrary.dtos.response.SearchBookResponse;
 import com.eLibrary.exception.ElibraryException;
 import lombok.extern.slf4j.Slf4j;
@@ -89,7 +90,7 @@ class LiberianServiceTest {
 
         ReadingListRequest request = new ReadingListRequest();
         request.setId(registerResponse.getId());
-        List<Book> readingList = liberianService.getReadingList(request);
+        ReadingListResponse readingList = liberianService.getReadingList(request);
         assertThat(Collections.singletonList(readingList)).isNotEmpty();
 
 
