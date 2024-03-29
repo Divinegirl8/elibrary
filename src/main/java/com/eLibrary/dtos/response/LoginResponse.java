@@ -6,5 +6,5 @@ import lombok.Setter;
 @Setter
 @Getter
 public class LoginResponse {
-    private boolean isLogin;
+    private Long id;
 }

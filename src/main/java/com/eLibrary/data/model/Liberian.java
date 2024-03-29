@@ -19,7 +19,6 @@ public class Liberian {
     private Long id;
     private String username;
     private String password;
-    private boolean isLogin;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "liberian_reading_list",

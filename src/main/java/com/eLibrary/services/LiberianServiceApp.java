@@ -60,13 +60,22 @@ public class LiberianServiceApp implements LiberianService {
     public LoginResponse login(LoginRequest request) throws ElibraryException {
         Liberian liberian = liberianRepository.findLiberianByUsername(request.getUsername().trim());
 
-        if (!userExist(request.getUsername().trim())){throw  new ElibraryException("login credentials is not valid!!!");}
-        if (!(liberian.getPassword().equals(request.getPassword().trim()))){throw new ElibraryException("login credentials is not valid");}
-         liberian.setLogin(true);
+        if (request.getUsername().isEmpty()){
+            throw new ElibraryException("{\"error\": \"username field cannot be empty\"}");
+        }
+
+        if (request.getPassword().isEmpty()){
+            throw new ElibraryException("{\"perror\": \"password field cannot be empty\"}");
+        }
+
+
+        if (!userExist(request.getUsername().trim())){throw  new ElibraryException("{\"error\"  : \"login credentials is not valid!!!\"}");}
+        if (!(liberian.getPassword().equals(request.getPassword().trim()))){throw new ElibraryException("{\"perror\" : \"login credentials is not valid\"}");}
+
         liberianRepository.save(liberian);
 
         LoginResponse response = new LoginResponse();
-        response.setLogin(liberian.isLogin());
+        response.setId(liberian.getId());
 
         return response;
     }
