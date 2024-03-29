@@ -4,14 +4,8 @@ import com.eLibrary.data.model.Book;
 import com.eLibrary.data.model.Liberian;
 import com.eLibrary.data.repository.BookRepository;
 import com.eLibrary.data.repository.LiberianRepository;
-import com.eLibrary.dtos.request.LiberianRegisterRequest;
-import com.eLibrary.dtos.request.LoginRequest;
-import com.eLibrary.dtos.request.ReadingListRequest;
-import com.eLibrary.dtos.request.SearchBookRequest;
-import com.eLibrary.dtos.response.LiberianRegisterResponse;
-import com.eLibrary.dtos.response.LoginResponse;
-import com.eLibrary.dtos.response.ReadingListResponse;
-import com.eLibrary.dtos.response.SearchBookResponse;
+import com.eLibrary.dtos.request.*;
+import com.eLibrary.dtos.response.*;
 import com.eLibrary.exception.ElibraryException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -76,6 +70,30 @@ public class LiberianServiceApp implements LiberianService {
 
         LoginResponse response = new LoginResponse();
         response.setId(liberian.getId());
+
+        return response;
+    }
+
+    @Override
+    public ForgotPasswordResponse forgotPassword(ForgotPasswordRequest request) throws ElibraryException {
+        Liberian liberian = liberianRepository.findLiberianByUsername(request.getUsername());
+
+        if (request.getUsername().isEmpty()){
+            throw new ElibraryException("{\"error\": \"username field cannot be empty\"}");
+        }
+
+       validateForgotPassword(request);
+
+        if (liberian == null){
+            throw new ElibraryException("{\"error\": \"username does not exist\"}");
+        }
+
+
+        liberian.setPassword(request.getPassword());
+        liberianRepository.save(liberian);
+
+        ForgotPasswordResponse response = new ForgotPasswordResponse();
+        response.setPassword(liberian.getPassword());
 
         return response;
     }
@@ -274,7 +292,7 @@ public class LiberianServiceApp implements LiberianService {
 
     private void validateUserName(LiberianRegisterRequest request) throws ElibraryException {
         if (!(request.getUsername().trim().matches("^(?=.*[a-z])(?=.*\\d)[a-z\\d]{5,10}$"))) {
-            throw new ElibraryException("{\"error\": \"Username must contain at least one letter & number,with length of 5 - 10.\"}");
+            throw new ElibraryException("{\"error\": \"Username must contain at least one small letter & number,with length of 5 - 10.\"}");
         }
     }
 
@@ -289,8 +307,18 @@ public class LiberianServiceApp implements LiberianService {
             throw new ElibraryException("{\"pError\": \"password field is empty, kindly provide your password\"}");
         }
 
-        if (!request.getPassword().matches("^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()+.=])(?!.*\\s).{6,10}$")) {
-            throw new ElibraryException("{\"pError\": \"password must contain letters,numbers,symbols,with length of 6 - 10.\"}");
+        if (!request.getPassword().matches("^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()+.=-])(?!.*\\s).{6,11}$")) {
+            throw new ElibraryException("{\"pError\": \"password must contain small letters,numbers,symbols,with length of 6 - 10.\"}");
+        }
+    }
+
+    private void validateForgotPassword(ForgotPasswordRequest request) throws ElibraryException {
+        if (request.getPassword().trim().isEmpty()){
+            throw new ElibraryException("{\"perror\": \"password field is empty, kindly provide your password\"}");
+        }
+
+        if (!request.getPassword().matches("^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()+.=-])(?!.*\\s).{6,11}$")) {
+            throw new ElibraryException("{\"perror\": \"password must contain small letters,numbers,symbols,with length of 6 - 10.\"}");
         }
     }
 

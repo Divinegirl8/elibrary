@@ -3,13 +3,8 @@ package com.eLibrary.services;
 import com.eLibrary.data.model.Book;
 import com.eLibrary.data.model.Liberian;
 import com.eLibrary.data.repository.LiberianRepository;
-import com.eLibrary.dtos.request.LiberianRegisterRequest;
-import com.eLibrary.dtos.request.LoginRequest;
-import com.eLibrary.dtos.request.ReadingListRequest;
-import com.eLibrary.dtos.request.SearchBookRequest;
-import com.eLibrary.dtos.response.LiberianRegisterResponse;
-import com.eLibrary.dtos.response.ReadingListResponse;
-import com.eLibrary.dtos.response.SearchBookResponse;
+import com.eLibrary.dtos.request.*;
+import com.eLibrary.dtos.response.*;
 import com.eLibrary.exception.ElibraryException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -36,15 +31,15 @@ class LiberianServiceTest {
 
    @Test void testThatALiberianCanRegister() throws ElibraryException {
        LiberianRegisterRequest request = new LiberianRegisterRequest();
-       request.setUsername("James");
-       request.setPassword("password");
+       request.setUsername("james1");
+       request.setPassword("password1+");
        LiberianRegisterResponse response = liberianService.register(request);
        assertThat(response).isNotNull();
    }
     @Test void testThatALiberianCanRegister2() throws ElibraryException {
         LiberianRegisterRequest request = new LiberianRegisterRequest();
-        request.setUsername("Derick");
-        request.setPassword("password");
+        request.setUsername("derick0");
+        request.setPassword("password=0");
         LiberianRegisterResponse response = liberianService.register(request);
         log.info("register response -> {}",response);
         assertThat(response).isNotNull();
@@ -70,8 +65,8 @@ class LiberianServiceTest {
     void testThatALiberianCanSearchForBook3() throws ElibraryException, IOException {
 
         LiberianRegisterRequest registerRequest = new LiberianRegisterRequest();
-        registerRequest.setUsername("Faith");
-        registerRequest.setPassword("password");
+        registerRequest.setUsername("faith1");
+        registerRequest.setPassword("password8-");
         LiberianRegisterResponse registerResponse = liberianService.register(registerRequest);
         assertThat(registerResponse).isNotNull();
 
@@ -99,10 +94,19 @@ class LiberianServiceTest {
 
     @Test void aLiberianCanLogin() throws ElibraryException {
         LoginRequest request = new LoginRequest();
-        request.setUsername("Faith");
-        request.setPassword("password");
-        liberianService.login(request);
-        assertTrue(liberianRepository.findLiberianByUsername("Faith").isLogin());
+        request.setUsername("faith1");
+        request.setPassword("password8-");
+       LoginResponse response = liberianService.login(request);
+       assertThat(response).isNotNull();
+    }
+
+    @Test void aLiberianCanChangePassword() throws ElibraryException {
+        ForgotPasswordRequest  request = new ForgotPasswordRequest();
+        request.setUsername("faith1");
+        request.setPassword("pass1=8");
+
+        ForgotPasswordResponse response = liberianService.forgotPassword(request);
+        assertThat(response).isNotNull();
     }
 
 

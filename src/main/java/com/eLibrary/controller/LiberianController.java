@@ -1,14 +1,8 @@
 package com.eLibrary.controller;
 
 import com.eLibrary.data.model.Book;
-import com.eLibrary.dtos.request.LiberianRegisterRequest;
-import com.eLibrary.dtos.request.LoginRequest;
-import com.eLibrary.dtos.request.ReadingListRequest;
-import com.eLibrary.dtos.request.SearchBookRequest;
-import com.eLibrary.dtos.response.LiberianRegisterResponse;
-import com.eLibrary.dtos.response.LoginResponse;
-import com.eLibrary.dtos.response.ReadingListResponse;
-import com.eLibrary.dtos.response.SearchBookResponse;
+import com.eLibrary.dtos.request.*;
+import com.eLibrary.dtos.response.*;
 import com.eLibrary.exception.ElibraryException;
 import com.eLibrary.services.LiberianService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +38,16 @@ public class LiberianController {
             return ResponseEntity.ok().body(response);
         } catch (ElibraryException e) {
           return ResponseEntity.status(UNAUTHORIZED).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/forgotPassword")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request){
+        try {
+            ForgotPasswordResponse response = service.forgotPassword(request);
+            return ResponseEntity.ok().body(response);
+        } catch (ElibraryException e) {
+            return ResponseEntity.status(UNAUTHORIZED).body(e.getMessage());
         }
     }
 
