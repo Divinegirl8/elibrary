@@ -65,7 +65,7 @@ class LiberianServiceTest {
     void testThatALiberianCanSearchForBook3() throws ElibraryException, IOException {
 
         LiberianRegisterRequest registerRequest = new LiberianRegisterRequest();
-        registerRequest.setUsername("faith1");
+        registerRequest.setUsername("faith2");
         registerRequest.setPassword("password8-");
         LiberianRegisterResponse registerResponse = liberianService.register(registerRequest);
         assertThat(registerResponse).isNotNull();
