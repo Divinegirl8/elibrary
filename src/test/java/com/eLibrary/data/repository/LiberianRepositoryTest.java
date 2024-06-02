@@ -26,8 +26,8 @@ class LiberianRepositoryTest {
         assertThat(liberian).isNotNull();
 
         log.info("liberian -> {}",liberian);
-
     }
+
 
 
 }
