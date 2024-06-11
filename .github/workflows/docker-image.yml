@@ -41,4 +41,4 @@ jobs:
         run: docker build -t divinejames8/app:latest .
 
       - name: Push Docker image to Docker Hub
-        run: docker push joshrichhy/fibonacci:latest
+        run: docker push divinejames8/app:latest
