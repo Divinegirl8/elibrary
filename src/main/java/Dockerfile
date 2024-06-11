@@ -1,5 +1,5 @@
 FROM maven:3.8.7 as build
-COPY . .
+COPY com/eLibrary .
 RUN mvn -B clean Package -DskipTests
 FROM openjdk:21
 COPY --from=build ./target/*.jar app.jar
