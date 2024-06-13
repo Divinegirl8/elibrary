@@ -1,9 +1,11 @@
+This is my own is working thou
+
 name: Deploy Docker Image to EC2
 
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-deploy:
@@ -24,21 +26,19 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/your-docker-image:latest .
-        docker push ${{ secrets.DOCKER_USERNAME }}/your-docker-image:latest
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/contactmanagement:latest .
+        docker push ${{ secrets.DOCKER_USERNAME }}/contactmanagement:latest
 
     - name: Install AWS CLI
       run: |
         sudo apt-get update
         sudo apt-get install -y awscli
 
-    - name: Download EC2 private key
-      env:
-        EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+    - name: Create SSH key file
       run: |
-        echo "${EC2_PRIVATE_KEY}" > my_library_key.pem
-        chmod 400 "my_library_key.pem"
-
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > $GITHUB_WORKSPACE/key.pem
+        chmod 400 $GITHUB_WORKSPACE/key.pem
+        
     - name: Deploy to EC2
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -47,25 +47,19 @@ jobs:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         INSTANCE_ID: ${{ secrets.INSTANCE_ID }}
+        KEY_NAME: ${{ secrets.KEY_NAME }}
         INSTANCE_USER: ${{ secrets.INSTANCE_USER }}
       run: |
         PUBLIC_DNS=$(aws ec2 describe-instances \
             --instance-ids $INSTANCE_ID \
             --query 'Reservations[0].Instances[0].PublicDnsName' \
             --output text)
+
         echo "Instance $INSTANCE_ID is running at $PUBLIC_DNS"
-        
-        SSH_COMMANDS=$(cat << 'EOF'
-        sudo yum update -y
-        sudo amazon-linux-extras install docker -y
-        sudo service docker start
-        sudo usermod -a -G docker $INSTANCE_USER
-        sudo systemctl enable docker
-        echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-        docker pull $DOCKER_USERNAME/your-docker-image:latest
-        docker run -d $DOCKER_USERNAME/your-docker-image:latest
-        EOF
-        )
-        
-        # Use -vvv for verbose SSH debugging
-        ssh -vvv -o StrictHostKeyChecking=no -i private_key.pem $INSTANCE_USER@$PUBLIC_DNS "$SSH_COMMANDS"
+
+        SSH_COMMANDS="sudo apt-get update -y
+                      sudo apt-get install -y docker.io
+                      sudo systemctl start docker
+                      sudo usermod -aG docker ${INSTANCE_USER}
+                      sudo systemctl enable docker
+                      echo $DOCKER_PASSWORD | sudo docker login --username $DOCKER_USERNAME
