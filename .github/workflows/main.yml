@@ -1,7 +1,3 @@
-This is my own is working thou
-
-name: Deploy Docker Image to EC2
-
 on:
   push:
     branches:
@@ -47,7 +43,7 @@ jobs:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         INSTANCE_ID: ${{ secrets.INSTANCE_ID }}
-        KEY_NAME: ${{ secrets.KEY_NAME }}
+        KEY_NAME: ${{ secrets.EC2_PRIVATE_KEY}}
         INSTANCE_USER: ${{ secrets.INSTANCE_USER }}
       run: |
         PUBLIC_DNS=$(aws ec2 describe-instances \
