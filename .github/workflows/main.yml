@@ -67,4 +67,5 @@ jobs:
         EOF
         )
         
-        ssh -o StrictHostKeyChecking=no -i private_key.pem $INSTANCE_USER@$PUBLIC_DNS "$SSH_COMMANDS"
+        # Use -vvv for verbose SSH debugging
+        ssh -vvv -o StrictHostKeyChecking=no -i private_key.pem $INSTANCE_USER@$PUBLIC_DNS "$SSH_COMMANDS"
