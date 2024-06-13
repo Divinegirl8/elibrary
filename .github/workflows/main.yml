@@ -55,7 +55,7 @@ jobs:
             --output text)
         echo "Instance $INSTANCE_ID is running at $PUBLIC_DNS"
         
-        SSH_COMMANDS=$(cat << EOF
+        SSH_COMMANDS=$(cat << 'EOF'
         sudo yum update -y
         sudo amazon-linux-extras install docker -y
         sudo service docker start
@@ -64,5 +64,7 @@ jobs:
         echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
         docker pull $DOCKER_USERNAME/your-docker-image:latest
         docker run -d $DOCKER_USERNAME/your-docker-image:latest
+        EOF
+        )
         
         ssh -o StrictHostKeyChecking=no -i private_key.pem $INSTANCE_USER@$PUBLIC_DNS "$SSH_COMMANDS"
