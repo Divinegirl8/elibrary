@@ -36,8 +36,8 @@ jobs:
       env:
         EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
       run: |
-        echo "${EC2_PRIVATE_KEY}" > private_key.pem
-        chmod 400 private_key.pem
+        echo "${EC2_PRIVATE_KEY}" > my_library_key.pem
+        chmod 400 "my_library_key.pem"
 
     - name: Deploy to EC2
       env:
